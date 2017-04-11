@@ -1,9 +1,94 @@
-<!DOCTYPE html>
 <html>
 <head>
-	<title>CS3300 Project Two</title>
+	<title> Project Two</title>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="http://d3js.org/topojson.v2.min.js"></script>
 </head>
 <body>
+<script type="text/javascript">
+	d3.queue()
+        .defer(d3.csv, "annual_all_2016.csv")
+        .defer(d3.csv, "daily_PM25FRM_2016.csv")
+        .defer(d3.json, "us.json")
+        .await(done_function);
 
+    function done_function(error, annual_2016_csv, daily2016_25_csv, us_json_data) {
+    	dailyData = daily2016_25_csv;
+    	yearlyData = annual_2016_csv;
+    	nested_Daily_data = d3.nest().key(function(d) {
+                return d.County_Name;//might be better as code
+            }).entries(daily2016_25_csv);
+
+        daily_data = nested_Daily_data.map(function(county) {
+            var result = {
+                County: county.key
+            };
+            result.Mean = [];
+            result.AQI = [];
+            result.Date = [];
+            county.values.forEach(function(d) {
+            	result.Mean.push(d.Arithmetic_Mean);
+            	result.AQI.push(d.AQI);
+            	result.Date.push(d.Date_Local);// only giving last date rn
+            	result.Lat = d.Latitude;
+            	result.Long = d.Longitude;
+            	result.Units = d.Units_of_Measure;
+            	
+            	result.Code = d.County_Code;
+            	result.State = d.State_Name;
+                
+            });
+            return result;
+        });
+        //Yearly
+        nested_Yearly = d3.nest().key(function(d){return d.County_Name;}).entries(annual_2016_csv);
+        annual_data = nested_Yearly.map(function(county){
+        	var result = {
+        		County: county.key
+        	};
+        	county.values.forEach(function(d){
+        		//"State_Code","County_Code","Site_Num","Parameter_Code","POC","Latitude","Longitude","Datum","Parameter_Name","Sample_Duration","Pollutant_Standard","Metric_Used","Method_Name","Year","Units_of_Measure","Event_Type","Observation_Count","Observation_Percent","Completeness_Indicator","Valid_Day_Count","Required_Day_Count","Exceptional_Data_Count","Null_Data_Count","Primary_Exceedance_Count","Secondary_Exceedance_Count","Certification_Indicator","Num_Obs_Below_MDL","Arithmetic_Mean","Arithmetic_Standard_Dev","1st_Max_Value","1st_Max_DateTime","2nd_Max_Value","2nd_Max_DateTime","3rd_Max_Value","3rd_Max_DateTime","4th_Max_Value","4th_Max_DateTime","1st_Max_Non_Overlapping_Value","1st_NO_Max_DateTime","2nd_Max_Non_Overlapping_Value","2nd_NO_Max_DateTime","99th_Percentile","98th_Percentile","95th_Percentile","90th_Percentile","75th_Percentile","50th_Percentile","10th_Percentile","Local_Site_Name","Address","State_Name","County_Name","City_Name","CBSA_Name","Date_of_Last_Change"
+        		result.Code = d.County_Code;
+        		result.State_Code = d.State_Code;
+        		result.Year = d.Year;
+        		result.Count = d.Observation_Count;
+        		result.City = d.City_Name;
+        		result.State = d.State_Name;
+        		result.Site = d.Local_Site_Name;
+        		result.Site_Num = d.Site_Num;
+        		if (d.Parameter_Name == "Ozone") {
+                        result.Ozone = d.Arithmetic_Mean;
+                } else if (d.Parameter_Name == "Average_Ambient_Temperature_for_MetOne_SASS/SuperSASS") {
+                    result.Avg_Temp = d.Arithmetic_Mean;
+                } else if (d.Parameter_Name == "Average_Ambient_Pressure_for_MetOne_SASS/SuperSASS") {
+                    result.Pressure = d.Arithmetic_Mean;
+                } else if (d.Parameter_Name == "PM2.5_-_Local_Conditions") {
+                    result.PM25 = d.Arithmetic_Mean;
+                } else if (d.Parameter_Name == "Acceptable_PM2.5_AQI_&_Speciation_Mass") {
+                    result.Acceptable_PM25_AQI_SPECMASS = d.Arithmetic_Mean;
+                } else if (d.Parameter_Name == "Carbon_monoxide") {
+                    result.Carbon_monoxide = d.Arithmetic_Mean;
+                } else if (d.Parameter_Name == "Sulfur_dioxide") {
+                    result.Sulfur_dioxide = d.Arithmetic_Mean;
+                } else if (d.Parameter_Name == "SO2_max_5-min_avg") {
+                    result.Sulfur_dioxide_5minAvg = d.Arithmetic_Mean;
+                }else if (d.Parameter_Name == "Reactive_oxides_of_nitrogen_(NOy)") {
+                    result.Reactive_NOy = d.Arithmetic_Mean;
+                }else if (d.Parameter_Name == "Nitric_oxide_(NO)") {
+                    result.NO = d.Arithmetic_Mean;
+                }else if (d.Parameter_Name == "Nitrogen_dioxide_(NO2)") {
+                    result.NO2 = d.Arithmetic_Mean;
+                }else if (d.Parameter_Name == "Oxides_of_nitrogen_(NOx)") {
+                    result.NOx = d.Arithmetic_Mean;
+                }else if (d.Parameter_Name == "PM10_Total_0-10um_STP") {
+                    result.PM10Total = d.Arithmetic_Mean;
+                }
+        	});
+        	return result;
+        });
+
+
+    }//END OF DONE FUNCTION
+</script>
 </body>
 </html>
