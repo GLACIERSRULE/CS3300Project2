@@ -124,14 +124,21 @@ function showMap(scale, variable) {
 	paths.enter().append("path").attr("class", "country")
 	.on("click", function (d) { console.log(d.id); })
 	.merge(paths)
-	.transition().duration(1000)
+	// .transition().duration(1000)
 	.style("fill", function (county) {
+        var result;
 		annual_data.forEach(function(d){
-			if (county.id == d.County){
-				console.log(d[variable]); // so the county code in dataset isnt FIPS?? TODO
-				return scale(d[variable])
+            var toText = county.id.toString();
+            var lastThree = toText.slice(-3);
+            var lastThreeDigis = +(lastThree);
+
+			if (lastThreeDigis == d.County){
+				// console.log(d.County, d[variable]); // so the county code in dataset isnt FIPS?? TODO
+				console.log(scale(d[variable]))
+                result = scale(d[variable]);
 			}
-		});		
+		});
+        return result;	
 	})
 	.attr("d", function (county) {
 		return pathGenerator(county);
