@@ -5,7 +5,27 @@
     <script src="http://d3js.org/topojson.v2.min.js"></script>
 </head>
 <body>
+
+<svg id="map1" height="600" width="900"></svg>
+
 <script type="text/javascript">
+
+var svg = d3.select("#map1");
+
+var projection = d3.geoAlbersUsa().scale(75);
+var pathGenerator = d3.geoPath().projection(projection);
+
+var divergingColors = ["#d8b365", "#f5f5f5", "#5ab4ac"];
+var sequentialColors = ['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c'];
+
+var populationScale = d3.scaleLinear().domain([-5, 0, 5]).range(divergingColors);
+var percentScale = d3.scaleLinear()
+.domain([0, 25, 50, 75, 100]).range(sequentialColors);
+
+var counties, states;
+var usdaAtlas;
+
+
 	d3.queue()
         .defer(d3.csv, "annual_all_2016.csv")
         .defer(d3.csv, "daily_PM25FRM_2016.csv")
@@ -85,10 +105,40 @@
                 }
         	});
         	return result;
-        });
+        }); 
+        //Start of Map stuff
+        counties = topojson.feature(us_json_data, us_json_data.objects.counties);
+		states = topojson.feature(us_json_data, us_json_data.objects.states);
 
+		showMap(0,0);
 
     }//END OF DONE FUNCTION
+
+function showMap(scale, variable) {
+	// Create or modify paths for each country
+	
+	projection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], counties);
+	pathGenerator = d3.geoPath().projection(projection);
+	
+	var paths = svg.selectAll("path.country").data(counties.features);
+	paths.enter().append("path").attr("class", "country")
+	.on("click", function (d) { console.log(d.id); })
+	.merge(paths)
+	.transition().duration(1000)
+	.style("fill", "black")//function (county) {
+		// Fill this in
+		//var countyData = usdaAtlas.get(county.id);
+		//if (countyData) {
+		//	return scale(countyData[variable]);
+		//}
+		
+	//})
+	.attr("d", function (county) {
+		return pathGenerator(county);
+	});
+	
+}
+
 </script>
 </body>
 </html>
