@@ -126,9 +126,9 @@ function showMap(scale, variable) {
 	.merge(paths)
 	.transition().duration(1000)
 	.style("fill", function (county) {
-		// Fill this in
 		annual_data.forEach(function(d){
 			if (county.id == d.County){
+				console.log(d[variable]); // so the county code in dataset isnt FIPS?? TODO
 				return scale(d[variable])
 			}
 		});		
