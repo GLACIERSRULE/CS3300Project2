@@ -28,38 +28,13 @@ var usdaAtlas;
 
 	d3.queue()
         .defer(d3.csv, "annual_all_2016.csv")
-        .defer(d3.csv, "daily_PM25FRM_2016.csv")
         .defer(d3.json, "us.json")
         .await(done_function);
 
-    function done_function(error, annual_2016_csv, daily2016_25_csv, us_json_data) {
-    	dailyData = daily2016_25_csv;
+    function done_function(error, annual_2016_csv, us_json_data) {
     	yearlyData = annual_2016_csv;
-    	nested_Daily_data = d3.nest().key(function(d) {
-                return d.County_Name;//might be better as code
-            }).entries(daily2016_25_csv);
 
-        daily_data = nested_Daily_data.map(function(county) {
-            var result = {
-                County: county.key
-            };
-            result.Mean = [];
-            result.AQI = [];
-            result.Date = [];
-            county.values.forEach(function(d) {
-            	result.Mean.push(d.Arithmetic_Mean);
-            	result.AQI.push(d.AQI);
-            	result.Date.push(d.Date_Local);// only giving last date rn
-            	result.Lat = d.Latitude;
-            	result.Long = d.Longitude;
-            	result.Units = d.Units_of_Measure;
-            	
-            	result.Code = Number(d.County_Code);
-            	result.State = d.State_Name;
-                
-            });
-            return result;
-        });
+       
         //Yearly
         nested_Yearly = d3.nest().key(function(d){return Number(d.County_Code);}).entries(annual_2016_csv);
         annual_data = nested_Yearly.map(function(county){
@@ -131,8 +106,9 @@ function showMap(scale, variable) {
             var toText = county.id.toString();
             var lastThree = toText.slice(-3);
             var lastThreeDigis = +(lastThree);
+            var dataFIPS = d.State_Code + d.County;
 
-			if (lastThreeDigis == d.County){
+			if (county.id == dataFIPS){
 				// console.log(d.County, d[variable]); // so the county code in dataset isnt FIPS?? TODO
 				console.log(scale(d[variable]))
                 result = scale(d[variable]);
