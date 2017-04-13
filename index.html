@@ -88,6 +88,57 @@ function parseRow(row){
         	});
         	return result;
         }); 
+       states_nested = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2016_csv);
+       annual_states = states_nested.map(function(county){
+       	var result = {
+        		State: county.key
+        	};
+        	result.Ozone = [];
+        	result.NO=[];
+        	result.Reactive_NOy=[];
+        	result.Sulfur_dioxide_5minAvg =[];
+        	result.Pressure = [];
+        	result.NO2 = [];
+        	result.NOx =[];
+        	result.PM25= [];
+        	result.PM10Total= [];
+        	result.Avg_Temp= [];
+        	result.Sulfur_dioxide= [];
+        	result.Carbon_monoxide= [];
+        	result.Acceptable_PM25_AQI_SPECMASS= [];
+        	county.values.forEach(function(d){
+        		result.State = d.State_Name;
+        		if (d.Parameter_Name == "Ozone") {
+                        result.Ozone.push(d.Arithmetic_Mean);
+                } else if (d.Parameter_Name == "Average_Ambient_Temperature_for_MetOne_SASS/SuperSASS") {
+                    result.Avg_Temp.push(d.Arithmetic_Mean);
+                } else if (d.Parameter_Name == "Average_Ambient_Pressure_for_MetOne_SASS/SuperSASS") {
+                    result.Pressure.push(d.Arithmetic_Mean);
+                } else if (d.Parameter_Name == "PM2.5_-_Local_Conditions") {
+                    result.PM25.push(d.Arithmetic_Mean);
+                } else if (d.Parameter_Name == "Acceptable_PM2.5_AQI_&_Speciation_Mass") {
+                    result.Acceptable_PM25_AQI_SPECMASS.push(d.Arithmetic_Mean);
+                } else if (d.Parameter_Name == "Carbon_monoxide") {
+                    result.Carbon_monoxide.push(d.Arithmetic_Mean);
+                } else if (d.Parameter_Name == "Sulfur_dioxide") {
+                    result.Sulfur_dioxide.push(d.Arithmetic_Mean);
+                } else if (d.Parameter_Name == "SO2_max_5-min_avg") {
+                    result.Sulfur_dioxide_5minAvg.push(d.Arithmetic_Mean);
+                }else if (d.Parameter_Name == "Reactive_oxides_of_nitrogen_(NOy)") {
+                    result.Reactive_NOy.push(d.Arithmetic_Mean);
+                }else if (d.Parameter_Name == "Nitric_oxide_(NO)") {
+                    result.NO.push(d.Arithmetic_Mean);
+                }else if (d.Parameter_Name == "Nitrogen_dioxide_(NO2)") {
+                    result.NO2.push(d.Arithmetic_Mean);
+                }else if (d.Parameter_Name == "Oxides_of_nitrogen_(NOx)") {
+                    result.NOx.push(d.Arithmetic_Mean);
+                }else if (d.Parameter_Name == "PM10_Total_0-10um_STP") {
+                    result.PM10Total.push(d.Arithmetic_Mean);
+                }
+        	});
+        	return result;
+       });
+
         //Start of Map stuff
         counties = topojson.feature(us_json_data, us_json_data.objects.counties);
 		states = topojson.feature(us_json_data, us_json_data.objects.states);
@@ -111,7 +162,6 @@ function showMap(scale, variable) {
         var result;
 		annual_data.forEach(function(d){
 			if (county.id == d.FIPS){
-				console.log(d[variable]);
                 result = scale(d[variable]);
 			}
 		});
