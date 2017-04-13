@@ -18,16 +18,22 @@ var pathGenerator = d3.geoPath().projection(projection);
 var divergingColors = ["#d8b365", "#f5f5f5", "#5ab4ac"];
 var sequentialColors = ['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c'];
 
-var populationScale = d3.scaleLinear().domain([0, 10, 50]).range(divergingColors);
+var populationScale = d3.scaleLinear().domain([0, 7, 15]).range(divergingColors);
 var percentScale = d3.scaleLinear()
 .domain([0, 25, 50, 75, 100]).range(sequentialColors);
 
 var counties, states;
 var usdaAtlas;
 
+function parseRow(row){
+	row.FIPS = row.State_Code + row.County_Code;
+	row.FIPS = Number(row.FIPS);
+	return row;
+}
+
 
 	d3.queue()
-        .defer(d3.csv, "annual_all_2016.csv")
+        .defer(d3.csv, "annual_all_2016.csv", parseRow)
         .defer(d3.json, "us.json")
         .await(done_function);
 
@@ -36,13 +42,14 @@ var usdaAtlas;
 
        
         //Yearly
-        nested_Yearly = d3.nest().key(function(d){return Number(d.County_Code);}).entries(annual_2016_csv);
+        nested_Yearly = d3.nest().key(function(d){return d.FIPS;}).entries(annual_2016_csv);
         annual_data = nested_Yearly.map(function(county){
         	var result = {
-        		County: county.key
+        		FIPS: county.key
         	};
         	county.values.forEach(function(d){
         		//"State_Code","County_Code","Site_Num","Parameter_Code","POC","Latitude","Longitude","Datum","Parameter_Name","Sample_Duration","Pollutant_Standard","Metric_Used","Method_Name","Year","Units_of_Measure","Event_Type","Observation_Count","Observation_Percent","Completeness_Indicator","Valid_Day_Count","Required_Day_Count","Exceptional_Data_Count","Null_Data_Count","Primary_Exceedance_Count","Secondary_Exceedance_Count","Certification_Indicator","Num_Obs_Below_MDL","Arithmetic_Mean","Arithmetic_Standard_Dev","1st_Max_Value","1st_Max_DateTime","2nd_Max_Value","2nd_Max_DateTime","3rd_Max_Value","3rd_Max_DateTime","4th_Max_Value","4th_Max_DateTime","1st_Max_Non_Overlapping_Value","1st_NO_Max_DateTime","2nd_Max_Non_Overlapping_Value","2nd_NO_Max_DateTime","99th_Percentile","98th_Percentile","95th_Percentile","90th_Percentile","75th_Percentile","50th_Percentile","10th_Percentile","Local_Site_Name","Address","State_Name","County_Name","City_Name","CBSA_Name","Date_of_Last_Change"
+        		result.County_Code = d.County_Code;
         		result.Name = d.County_Name;
         		result.State_Code = d.State_Code;
         		result.Year = d.Year;
@@ -85,7 +92,7 @@ var usdaAtlas;
         counties = topojson.feature(us_json_data, us_json_data.objects.counties);
 		states = topojson.feature(us_json_data, us_json_data.objects.states);
 
-		showMap(populationScale,"PM10Total");
+		showMap(populationScale,"PM25");
 
     }//END OF DONE FUNCTION
 
@@ -103,14 +110,8 @@ function showMap(scale, variable) {
 	.style("fill", function (county) {
         var result;
 		annual_data.forEach(function(d){
-            var toText = county.id.toString();
-            var lastThree = toText.slice(-3);
-            var lastThreeDigis = +(lastThree);
-            var dataFIPS = d.State_Code + d.County;
-
-			if (county.id == dataFIPS){
-				// console.log(d.County, d[variable]); // so the county code in dataset isnt FIPS?? TODO
-				console.log(scale(d[variable]))
+			if (county.id == d.FIPS){
+				console.log(d[variable]);
                 result = scale(d[variable]);
 			}
 		});
