@@ -34,16 +34,20 @@ function parseRow(row){
 
 	d3.queue()
         .defer(d3.csv, "annual_all_2016.csv", parseRow)
+        .defer(d3.csv, "annual_all_2015.csv", parseRow)
         .defer(d3.json, "us.json")
         .await(done_function);
 
-    function done_function(error, annual_2016_csv, us_json_data) {
+    function done_function(error, annual_2016_csv, annual_2015_csv, us_json_data) {
     	yearlyData = annual_2016_csv;
+    	yearly2015 = annual_2015_csv;
 
        
         //Yearly
         nested_Yearly = d3.nest().key(function(d){return d.FIPS;}).entries(annual_2016_csv);
-        annual_data = nested_Yearly.map(function(county){
+        nested_2015 = d3.nest().key(function(d){return d.FIPS;}).entries(annual_2015_csv);
+        combined_Yearly = nested_Yearly.concat(nested_2015);
+        annual_data = combined_Yearly.map(function(county){
         	var result = {
         		FIPS: county.key
         	};
@@ -143,11 +147,11 @@ function parseRow(row){
         counties = topojson.feature(us_json_data, us_json_data.objects.counties);
 		states = topojson.feature(us_json_data, us_json_data.objects.states);
 
-		showMap(populationScale,"PM25");
+		showMap(populationScale,"PM25","2016");
 
     }//END OF DONE FUNCTION
 
-function showMap(scale, variable) {
+function showMap(scale, variable, year) {
 	// Create or modify paths for each country
 	
 	projection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], counties);
@@ -157,11 +161,11 @@ function showMap(scale, variable) {
 	paths.enter().append("path").attr("class", "country")
 	.on("click", function (d) { console.log(d.id); })
 	.merge(paths)
-	// .transition().duration(1000)
+	.transition().duration(1000)
 	.style("fill", function (county) {
         var result;
 		annual_data.forEach(function(d){
-			if (county.id == d.FIPS){
+			if (county.id == d.FIPS && d.Year == year){
                 result = scale(d[variable]);
 			}
 		});
