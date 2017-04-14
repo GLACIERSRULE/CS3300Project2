@@ -34,6 +34,15 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        #map1{
+            float: left;
+        }
+
+        #menu{
+            float:left;
+            padding: 40px;
+        }
     </style>
 <div id="loading">
     <p>
@@ -43,7 +52,7 @@
     </div>
 </div>
 
-<svg id="map1" height="600" width="900"></svg>
+<svg id="map1" height="500" width="800"></svg>
 
 <script type="text/javascript">
 
@@ -214,7 +223,7 @@ function showMap(scale, variable, year) {
 
     $('#loading').toggle();
 
-    $('body').append('<p><input class="with-gap" name="group1" type="radio" id="test1" checked /><label for="test1">PM10 Total</label></p><p><input class="with-gap" name="group1" type="radio" id="test2" /><label for="test2">Ozone</label></p><p><input class="with-gap" name="group1" type="radio" id="test3"  /><label for="test3">CO</label></p>');
+    $('body').append('<div id="menu"><h4>Select Measure</h4><p><input class="with-gap" name="group1" type="radio" id="test1" checked /><label for="test1">PM10 Total</label></p><p><input class="with-gap" name="group1" type="radio" id="test2" /><label for="test2">Ozone</label></p><p><input class="with-gap" name="group1" type="radio" id="test3"  /><label for="test3">CO</label></p></div>');
 	
 }
 
