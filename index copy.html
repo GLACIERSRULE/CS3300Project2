@@ -35,6 +35,7 @@
             100% { transform: rotate(360deg); }
         }
     </style>
+
 <div id="loading">
     <p>
         <h2>Initializing Visualization...</h2>
@@ -43,11 +44,7 @@
     </div>
 </div>
 
-<svg id="map1" height="600" width="900"></svg>
-
 <script type="text/javascript">
-
-var svg = d3.select("#map1");
 
 var projection = d3.geoAlbersUsa().scale(75);
 var pathGenerator = d3.geoPath().projection(projection);
@@ -55,42 +52,63 @@ var pathGenerator = d3.geoPath().projection(projection);
 var divergingColors = ["#d8b365", "#f5f5f5", "#5ab4ac"];
 var sequentialColors = ['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c'];
 
-var populationScale = d3.scaleLinear().domain([0, 7, 15]).range(divergingColors);
+var populationScale = d3.scaleLinear().domain([0, 10, 50]).range(divergingColors);
 var percentScale = d3.scaleLinear()
 .domain([0, 25, 50, 75, 100]).range(sequentialColors);
 
 var counties, states;
 var usdaAtlas;
-
-function parseRow(row){
-	row.FIPS = row.State_Code + row.County_Code;
-	row.FIPS = Number(row.FIPS);
-	return row;
-}
+var svg;
 
 
 	d3.queue()
-        .defer(d3.csv, "annual_all_2016.csv", parseRow)
-        .defer(d3.csv, "annual_all_2015.csv", parseRow)
+        .defer(d3.csv, "annual_all_2016.csv")
+        .defer(d3.csv, "daily_PM25FRM_2016.csv")
         .defer(d3.json, "us.json")
         .await(done_function);
 
-    function done_function(error, annual_2016_csv, annual_2015_csv, us_json_data) {
+    function done_function(error, annual_2016_csv, daily2016_25_csv, us_json_data) {
+        
+        svg = d3.select("body").append("svg")
+            .attr("id", "map1")
+            .attr("height", 600)
+            .attr("width", 900);
+        
+        dailyData = daily2016_25_csv;
     	yearlyData = annual_2016_csv;
-    	yearly2015 = annual_2015_csv;
+    	nested_Daily_data = d3.nest().key(function(d) {
+                return d.County_Name;//might be better as code
+            }).entries(daily2016_25_csv);
 
-       
+        daily_data = nested_Daily_data.map(function(county) {
+            var result = {
+                County: county.key
+            };
+            result.Mean = [];
+            result.AQI = [];
+            result.Date = [];
+            county.values.forEach(function(d) {
+            	result.Mean.push(d.Arithmetic_Mean);
+            	result.AQI.push(d.AQI);
+            	result.Date.push(d.Date_Local);// only giving last date rn
+            	result.Lat = d.Latitude;
+            	result.Long = d.Longitude;
+            	result.Units = d.Units_of_Measure;
+            	
+            	result.Code = Number(d.County_Code);
+            	result.State = d.State_Name;
+                
+            });
+            return result;
+        });
         //Yearly
-        nested_Yearly = d3.nest().key(function(d){return d.FIPS;}).entries(annual_2016_csv);
-        nested_2015 = d3.nest().key(function(d){return d.FIPS;}).entries(annual_2015_csv);
-        combined_Yearly = nested_Yearly.concat(nested_2015);
-        annual_data = combined_Yearly.map(function(county){
+        nested_Yearly = d3.nest().key(function(d){return Number(d.County_Code);}).entries(annual_2016_csv);
+        annual_data = nested_Yearly.map(function(county){
         	var result = {
-        		FIPS: county.key
+        		County: county.key
         	};
         	county.values.forEach(function(d){
         		//"State_Code","County_Code","Site_Num","Parameter_Code","POC","Latitude","Longitude","Datum","Parameter_Name","Sample_Duration","Pollutant_Standard","Metric_Used","Method_Name","Year","Units_of_Measure","Event_Type","Observation_Count","Observation_Percent","Completeness_Indicator","Valid_Day_Count","Required_Day_Count","Exceptional_Data_Count","Null_Data_Count","Primary_Exceedance_Count","Secondary_Exceedance_Count","Certification_Indicator","Num_Obs_Below_MDL","Arithmetic_Mean","Arithmetic_Standard_Dev","1st_Max_Value","1st_Max_DateTime","2nd_Max_Value","2nd_Max_DateTime","3rd_Max_Value","3rd_Max_DateTime","4th_Max_Value","4th_Max_DateTime","1st_Max_Non_Overlapping_Value","1st_NO_Max_DateTime","2nd_Max_Non_Overlapping_Value","2nd_NO_Max_DateTime","99th_Percentile","98th_Percentile","95th_Percentile","90th_Percentile","75th_Percentile","50th_Percentile","10th_Percentile","Local_Site_Name","Address","State_Name","County_Name","City_Name","CBSA_Name","Date_of_Last_Change"
-        		result.County_Code = d.County_Code;
         		result.Name = d.County_Name;
         		result.State_Code = d.State_Code;
         		result.Year = d.Year;
@@ -129,66 +147,17 @@ function parseRow(row){
         	});
         	return result;
         }); 
-       states_nested = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2016_csv);
-       annual_states = states_nested.map(function(county){
-       	var result = {
-        		State: county.key
-        	};
-        	result.Ozone = [];
-        	result.NO=[];
-        	result.Reactive_NOy=[];
-        	result.Sulfur_dioxide_5minAvg =[];
-        	result.Pressure = [];
-        	result.NO2 = [];
-        	result.NOx =[];
-        	result.PM25= [];
-        	result.PM10Total= [];
-        	result.Avg_Temp= [];
-        	result.Sulfur_dioxide= [];
-        	result.Carbon_monoxide= [];
-        	result.Acceptable_PM25_AQI_SPECMASS= [];
-        	county.values.forEach(function(d){
-        		result.State = d.State_Name;
-        		if (d.Parameter_Name == "Ozone") {
-                        result.Ozone.push(d.Arithmetic_Mean);
-                } else if (d.Parameter_Name == "Average_Ambient_Temperature_for_MetOne_SASS/SuperSASS") {
-                    result.Avg_Temp.push(d.Arithmetic_Mean);
-                } else if (d.Parameter_Name == "Average_Ambient_Pressure_for_MetOne_SASS/SuperSASS") {
-                    result.Pressure.push(d.Arithmetic_Mean);
-                } else if (d.Parameter_Name == "PM2.5_-_Local_Conditions") {
-                    result.PM25.push(d.Arithmetic_Mean);
-                } else if (d.Parameter_Name == "Acceptable_PM2.5_AQI_&_Speciation_Mass") {
-                    result.Acceptable_PM25_AQI_SPECMASS.push(d.Arithmetic_Mean);
-                } else if (d.Parameter_Name == "Carbon_monoxide") {
-                    result.Carbon_monoxide.push(d.Arithmetic_Mean);
-                } else if (d.Parameter_Name == "Sulfur_dioxide") {
-                    result.Sulfur_dioxide.push(d.Arithmetic_Mean);
-                } else if (d.Parameter_Name == "SO2_max_5-min_avg") {
-                    result.Sulfur_dioxide_5minAvg.push(d.Arithmetic_Mean);
-                }else if (d.Parameter_Name == "Reactive_oxides_of_nitrogen_(NOy)") {
-                    result.Reactive_NOy.push(d.Arithmetic_Mean);
-                }else if (d.Parameter_Name == "Nitric_oxide_(NO)") {
-                    result.NO.push(d.Arithmetic_Mean);
-                }else if (d.Parameter_Name == "Nitrogen_dioxide_(NO2)") {
-                    result.NO2.push(d.Arithmetic_Mean);
-                }else if (d.Parameter_Name == "Oxides_of_nitrogen_(NOx)") {
-                    result.NOx.push(d.Arithmetic_Mean);
-                }else if (d.Parameter_Name == "PM10_Total_0-10um_STP") {
-                    result.PM10Total.push(d.Arithmetic_Mean);
-                }
-        	});
-        	return result;
-       });
-
         //Start of Map stuff
         counties = topojson.feature(us_json_data, us_json_data.objects.counties);
 		states = topojson.feature(us_json_data, us_json_data.objects.states);
 
-		showMap(populationScale,"PM25","2016");
+		showMap(populationScale,"PM10Total");
+
+        document.body.innerHTML += '<p><input class="with-gap" name="group1" type="radio" id="test1" checked /><label for="test1">PM10 Total</label></p><p><input class="with-gap" name="group1" type="radio" id="test2" /><label for="test2">Ozone</label></p><p><input class="with-gap" name="group1" type="radio" id="test3"  /><label for="test3">CO</label></p>';
 
     }//END OF DONE FUNCTION
 
-function showMap(scale, variable, year) {
+function showMap(scale, variable) {
 	// Create or modify paths for each country
 	
 	projection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], counties);
@@ -198,11 +167,17 @@ function showMap(scale, variable, year) {
 	paths.enter().append("path").attr("class", "country")
 	.on("click", function (d) { console.log(d.id); })
 	.merge(paths)
-	.transition().duration(1000)
+	// .transition().duration(1000)
 	.style("fill", function (county) {
         var result;
 		annual_data.forEach(function(d){
-			if (county.id == d.FIPS && d.Year == year){
+            var toText = county.id.toString();
+            var lastThree = toText.slice(-3);
+            var lastThreeDigis = +(lastThree);
+
+			if (lastThreeDigis == d.County){
+				// console.log(d.County, d[variable]); // so the county code in dataset isnt FIPS?? TODO
+				// console.log(scale(d[variable]))
                 result = scale(d[variable]);
 			}
 		});
@@ -213,9 +188,6 @@ function showMap(scale, variable, year) {
 	});
 
     $('#loading').toggle();
-
-    $('body').append('<p><input class="with-gap" name="group1" type="radio" id="test1" checked /><label for="test1">PM10 Total</label></p><p><input class="with-gap" name="group1" type="radio" id="test2" /><label for="test2">Ozone</label></p><p><input class="with-gap" name="group1" type="radio" id="test3"  /><label for="test3">CO</label></p>');
-	
 }
 
 </script>
