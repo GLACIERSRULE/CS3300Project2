@@ -87,14 +87,24 @@ function parseRow(row){
         .defer(d3.csv, "annual_all_2011.csv", parseRow)
         .defer(d3.csv, "annual_all_2010.csv", parseRow)
         .defer(d3.csv, "annual_all_2009.csv", parseRow)
-        .defer(d3.csv, "annual_all_2008.csv", parseRow)
+        /*.defer(d3.csv, "annual_all_2008.csv", parseRow)
         .defer(d3.csv, "annual_all_2007.csv", parseRow)
         .defer(d3.csv, "annual_all_2006.csv", parseRow)
         .defer(d3.csv, "annual_all_2005.csv", parseRow)
+        .defer(d3.csv, "annual_all_2004.csv", parseRow)
+        .defer(d3.csv, "annual_all_2003.csv", parseRow)
+        .defer(d3.csv, "annual_all_2002.csv", parseRow)
+        .defer(d3.csv, "annual_all_2001.csv", parseRow)
+        .defer(d3.csv, "annual_all_2000.csv", parseRow)
+        .defer(d3.csv, "annual_all_1998.csv", parseRow)
+        .defer(d3.csv, "annual_all_1996.csv", parseRow)
+        .defer(d3.csv, "annual_all_1994.csv", parseRow)
+        .defer(d3.csv, "annual_all_1992.csv", parseRow)
+        .defer(d3.csv, "annual_all_1990.csv", parseRow)*/
         .defer(d3.json, "us.json")
         .await(done_function);
 
-    function done_function(error, annual_2016_csv, annual_2015_csv,annual_2014_csv, annual_2013_csv,annual_2012_csv, annual_2011_csv,annual_2010_csv, annual_2009_csv,annual_2008_csv, annual_2007_csv,annual_2006_csv, annual_2005_csv, us_json_data) {
+    function done_function(error, annual_2016_csv, annual_2015_csv,annual_2014_csv, annual_2013_csv,annual_2012_csv, annual_2011_csv,annual_2010_csv, annual_2009_csv,/*annual_2008_csv, annual_2007_csv,annual_2006_csv, annual_2005_csv,annual_2004_csv, annual_2003_csv,annual_2002_csv, annual_2001_csv,annual_2000_csv, annual_1998_csv,annual_1996_csv,annual_1994_csv,annual_1992_csv,annual_1990_csv, */us_json_data) {
     	yearlyData = annual_2016_csv;
     	yearly2015 = annual_2015_csv;
         //Yearly
@@ -104,8 +114,18 @@ function parseRow(row){
         nested_2013 = d3.nest().key(function(d){return d.FIPS;}).entries(annual_2013_csv);
         nested_2012 = d3.nest().key(function(d){return d.FIPS;}).entries(annual_2012_csv);
         nested_2011 = d3.nest().key(function(d){return d.FIPS;}).entries(annual_2011_csv);
-        combined_Yearly = nested_Yearly.concat(nested_2015).concat(nested_2014).concat(nested_2013).concat(nested_2012).concat(nested_2011);
-        combined_Yearly = combined_Yearly.concat()
+        nested_2010 = d3.nest().key(function(d){return d.FIPS;}).entries(annual_2010_csv);
+        combined_Yearly = nested_Yearly.concat(nested_2015).concat(nested_2014).concat(nested_2013).concat(nested_2012).concat(nested_2011).concat(nested_2010);
+        combined_Yearly = combined_Yearly.concat()//.concat(d3.nest().key(function(d){return d.FIPS;}).entries(annual_2009_csv););
+        	/*.concat(d3.nest().key(function(d){return d.FIPS;}).entries(annual_2008_csv);)
+        	.concat(d3.nest().key(function(d){return d.FIPS;}).entries(annual_2007_csv);)
+        	.concat(d3.nest().key(function(d){return d.FIPS;}).entries(annual_2006_csv);)
+        	.concat(d3.nest().key(function(d){return d.FIPS;}).entries(annual_2005_csv);)
+        	.concat(d3.nest().key(function(d){return d.FIPS;}).entries(annual_2004_csv);)
+        	.concat(d3.nest().key(function(d){return d.FIPS;}).entries(annual_2003_csv);)
+        	.concat(d3.nest().key(function(d){return d.FIPS;}).entries(annual_2002_csv);)
+        	.concat(d3.nest().key(function(d){return d.FIPS;}).entries(annual_2001_csv);)
+        	.concat(d3.nest().key(function(d){return d.FIPS;}).entries(annual_2000_csv););*/
         annual_data = combined_Yearly.map(function(county){
         	var result = {
         		FIPS: county.key
