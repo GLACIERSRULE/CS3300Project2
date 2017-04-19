@@ -255,8 +255,6 @@ function showMap(scale, variable, year) {
 	});
 
     $('#loading').toggle();
-
-    $('body').append('<div id="menu"><h4>Select Measure</h4><p><input class="with-gap" name="group1" type="radio" id="test1" checked /><label for="test1">PM10 Total</label></p><p><input class="with-gap" name="group1" type="radio" id="test2" /><label for="test2">Ozone</label></p><p><input class="with-gap" name="group1" type="radio" id="test3"  /><label for="test3">CO</label></p></div>');
 	
 }
 function changeMap(scale,variable,year){
@@ -275,6 +273,8 @@ function changeMap(scale,variable,year){
         return result;	
 	});
 }
+
+$('body').append('<div id="menu"><h4>Select Measure</h4><p><input class="with-gap" name="group1" type="radio" id="test1" checked /><label for="test1">PM10 Total</label></p><p><input class="with-gap" name="group1" type="radio" id="test2" /><label for="test2">Ozone</label></p><p><input class="with-gap" name="group1" type="radio" id="test3"  /><label for="test3">CO</label></p></div>');
 
 </script>
 </body>
