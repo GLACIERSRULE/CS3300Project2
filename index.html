@@ -141,6 +141,7 @@ function parseRow(row){
         		result.State = d.State_Name;
         		result.Site = d.Local_Site_Name;
         		result.Site_Num = d.Site_Num;
+                // Ozone, PM25, PM10, CO, SO2, NOx
         		if (d.Parameter_Name == "Ozone") {
                         result.Ozone = d.Arithmetic_Mean;
                 } else if (d.Parameter_Name == "Average_Ambient_Temperature_for_MetOne_SASS/SuperSASS") {
@@ -226,7 +227,7 @@ function parseRow(row){
         counties = topojson.feature(us_json_data, us_json_data.objects.counties);
 		states = topojson.feature(us_json_data, us_json_data.objects.states);
 
-		showMap(populationScale,"PM25","2016");
+		showMap(populationScale,"PM25","2013");
 
     }//END OF DONE FUNCTION
 
@@ -242,7 +243,7 @@ function showMap(scale, variable, year) {
 	.merge(paths)
 	.transition().duration(1000)
 	.style("fill", function (county) {
-        var result;
+        var result = d3.rgb(0,0,0);
 		annual_data.forEach(function(d){
 			if (county.id == d.FIPS && d.Year == year){
                 result = scale(d[variable]);
