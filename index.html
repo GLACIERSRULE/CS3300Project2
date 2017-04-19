@@ -226,7 +226,7 @@ function parseRow(row){
         counties = topojson.feature(us_json_data, us_json_data.objects.counties);
 		states = topojson.feature(us_json_data, us_json_data.objects.states);
 
-		showMap(populationScale,"PM25","2016");
+		showMap(populationScale,"PM25","2013");
 
     }//END OF DONE FUNCTION
 
@@ -242,7 +242,7 @@ function showMap(scale, variable, year) {
 	.merge(paths)
 	.transition().duration(1000)
 	.style("fill", function (county) {
-        var result;
+        var result = rgb(0,0,0);
 		annual_data.forEach(function(d){
 			if (county.id == d.FIPS && d.Year == year){
                 result = scale(d[variable]);
