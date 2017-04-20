@@ -71,7 +71,31 @@
             margin-left: 5px;
             margin-top: 5px;
         }
+
+        #header{
+            padding-left: 40px;
+            display: none;
+        }
+
+        #header h6{
+            color: lightgrey;
+            margin-bottom: 0;
+        }
+        #header h4{
+            color: grey;
+            margin-top: 0;
+        }
+        #header h2{
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
     </style>
+<div id="header">
+<h6>Sam Hamburger, Brian Zahka, Weston Forster, Sam Weintraub</h6>
+<h2>Pollution in the United States</h2>
+<h4>By State, County, and Year<h4>
+</div>
+
 <div id="loading">
     <p>
         <h2>Initializing Visualization...</h2>
@@ -90,17 +114,6 @@
     <p><svg id="scatter" height="400" width="800"></svg></p>
 </div>
 
-
-<!-- Modal Structure -->
-<div id="modal1" class="modal">
-    <div class="modal-content">
-        <p><svg id="scatter" height="400" width="800"></svg></p>
-    </div>
-    <div class="modal-footer">
-        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
-    </div>
-</div>
-
 <script type="text/javascript">
 
 var svg = d3.select("#map1");
@@ -117,6 +130,8 @@ var sequentialColors = ['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c'];
 var populationScale = d3.scaleLinear().domain([0, 7, 15]).range(divergingColors);
 var percentScale = d3.scaleLinear()
 .domain([0, 25, 50, 75, 100]).range(sequentialColors);
+
+
 
 var ozoneScale = d3.scaleLinear().domain([0.012, 0.062]).interpolate(d3.interpolateHcl).range(["#ffff00","#cc0000"]);
 
@@ -412,7 +427,8 @@ function parseRow(row){
 		showMap(populationScale,"avgPM10Total","2014");
 
     plotState(scatter, states_allyears, "51", "Ozone",yScale,codes_to_names);
-        $('#loading').toggle();
+    $('#loading').toggle();
+    $('#header').show();
 
     }//END OF DONE FUNCTION
 
