@@ -206,10 +206,36 @@ function parseRow(row){
         	});
         	return result;
         }); 
-
+        
        states_nested = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2015_csv);
+       //states2015 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2015_csv);
        states2014 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2014_csv);
-       states_nested = states_nested.concat(states2014);
+       states2012 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2012_csv);
+       states2010 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2010_csv);
+       states2008 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2008_csv);
+       states2006 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2006_csv);
+       states2004 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2004_csv);
+       states2002 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2002_csv);
+       states2000 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2000_csv);
+       states1998 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_1998_csv);
+       states1996 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_1996_csv);
+       states1994 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_1994_csv);
+       states1992 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_1992_csv);
+       states1990 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_1990_csv);
+       states_nested = states_nested.concat(states2014)
+       								//.concat(states2015)
+       								.concat(states2012)
+       								.concat(states2010)
+       								.concat(states2008)
+       								.concat(states2006)
+       								.concat(states2004)
+       								.concat(states2002)
+       								.concat(states2000)
+       								.concat(states1998)
+       								.concat(states1996)
+       								.concat(states1994)
+       								.concat(states1992)
+       								.concat(states1990);
        annual_states = states_nested.map(function(county){
        	var result = {
         		State: county.key
@@ -230,17 +256,17 @@ function parseRow(row){
         		result.State = d.State_Name;
         		result.State_Code = d.State_Code;
         		result.Year = d.Year;
-        		if (d.Parameter_Name == "Ozone" && ( d.Metric_Used == "Observed_Values" || d.Metric_Used == "Daily_Mean")) {
+        		if (d.Parameter_Name == "Ozone" /* && ( d.Metric_Used == "Observed_Values" || d.Metric_Used == "Daily_Mean") */) {
                         result.Ozone.push(d.Arithmetic_Mean);
-                } else if (d.Parameter_Name == "PM2.5_-_Local_Conditions" && ( d.Metric_Used == "Observed_Values" || d.Metric_Used == "Daily_Mean")) {
+                } else if (d.Parameter_Name == "PM2.5_-_Local_Conditions" ) {
                     result.PM25.push(d.Arithmetic_Mean);
-                } else if (d.Parameter_Name == "Carbon_monoxide" && ( d.Metric_Used == "Observed_Values" || d.Metric_Used == "Daily_Mean")) {
+                } else if (d.Parameter_Name == "Carbon_monoxide" ) {
                     result.Carbon_monoxide.push(d.Arithmetic_Mean);
-                } else if (d.Parameter_Name == "Sulfur_dioxide" && ( d.Metric_Used == "Observed_Values" || d.Metric_Used == "Daily_Mean")) {
+                } else if (d.Parameter_Name == "Sulfur_dioxide" ) {
                     result.Sulfur_dioxide.push(d.Arithmetic_Mean);
-                } else if (d.Parameter_Name == "Oxides_of_nitrogen_(NOx)" && ( d.Metric_Used == "Observed_Values" || d.Metric_Used == "Daily_Mean")) {
+                } else if (d.Parameter_Name == "Oxides_of_nitrogen_(NOx)" ) {
                     result.NOx.push(d.Arithmetic_Mean);
-                }else if (d.Parameter_Name == "PM10_Total_0-10um_STP" && ( d.Metric_Used == "Observed_Values" || d.Metric_Used == "Daily_Mean"))  {
+                }else if (d.Parameter_Name == "PM10_Total_0-10um_STP" )  {
                     result.PM10Total.push(d.Arithmetic_Mean);
                 }
         	});
