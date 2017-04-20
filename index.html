@@ -20,6 +20,20 @@
             text-align: center;
         }
 
+        #detail{
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 800px;
+            height: 440px;
+            margin: -200px 0 0 -400px;
+            display: none;
+            background-color: aliceblue;
+            -webkit-box-shadow: 0px 0px 10px 6px rgba(138,138,138,1);
+            -moz-box-shadow: 0px 0px 10px 6px rgba(138,138,138,1);
+            box-shadow: 0px 0px 10px 6px rgba(138,138,138,1);
+            z-index: 0;
+        }
         .loader {
             position: absolute;
             left: 50%;
@@ -45,10 +59,17 @@
         #menu{
             float:left;
             padding: 40px;
+            z-index: 9;
         }
 
         label{
             margin-right: 1em;
+        }
+
+        #detail a{
+            position:absolute;
+            margin-left: 5px;
+            margin-top: 5px;
         }
     </style>
 <div id="loading">
@@ -64,7 +85,21 @@
 <br>
 <br>
 
-<svg id="scatter" height="400" width="800"></svg>
+<div id="detail">
+    <a class="waves-effect waves-light btn" id="close">close</a>
+    <p><svg id="scatter" height="400" width="800"></svg></p>
+</div>
+
+
+<!-- Modal Structure -->
+<div id="modal1" class="modal">
+    <div class="modal-content">
+        <p><svg id="scatter" height="400" width="800"></svg></p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+    </div>
+</div>
 
 <script type="text/javascript">
 
@@ -94,7 +129,7 @@ var param_mapping = {"avgPM10Total":"PM10", "avgPM25":"PM25", "avgOzone":"Ozone"
 
 let currentScale = populationScale;
 let currentMeasure = "avgPM10Total";
-let currentYear = "1990";
+let currentYear = "2014";
 
 function parseRow(row){
 	row.FIPS = row.State_Code + row.County_Code;
@@ -374,7 +409,7 @@ function parseRow(row){
 		states = topojson.feature(us_json_data, us_json_data.objects.states);
     states_allyear = states_allyears
     code_to_name = codes_to_names;
-		showMap(populationScale,"avgPM10Total","1990");
+		showMap(populationScale,"avgPM10Total","2014");
 
     plotState(scatter, states_allyears, "51", "Ozone",yScale,codes_to_names);
         $('#loading').toggle();
@@ -473,10 +508,15 @@ function showMap(scale, variable, year) {
 	var paths = svg.selectAll("path.country").data(states.features);
 	paths.enter().append("path").attr("class", "country")
 	.on("click", function (d) { 
-    $("#scatter").empty();
-    var pollutant = param_mapping[currentMeasure];
-    plotState(scatter, states_allyear, d.id, pollutant, yScale,code_to_name);
-    console.log(currentMeasure); })
+        $("#scatter").empty();
+        var pollutant = param_mapping[currentMeasure];
+        plotState(scatter, states_allyear, d.id, pollutant, yScale,code_to_name);
+        $("#menu").toggle();
+        $('#detail').toggle("slow", function(){
+
+        });
+        console.log(currentMeasure);
+    })
 	.merge(paths)
 	.transition().duration(1000)
 	.style("fill", function (state) {
@@ -521,7 +561,7 @@ $('body').append('\
         <p><input class="with-gap" name="group1" type="radio" id="so2" value="avgSulfur_dioxide" /><label for="so2">Avg. SO2</label></p>\
         <p><input class="with-gap" name="group1" type="radio" id="nox" value="avgNOx" /><label for="nox">Avg. NOx</label></p>\
         <h4>Select Year</h4>\
-        <p class="range-field"><label for="year">Year: <span id="thisYear">1990<span></label><input type="range" name="year" id="year" min="1990" max="2014" step="2" value="1990" /></div></p>\
+        <p class="range-field"><label for="year">Year: <span id="thisYear">2014<span></label><input type="range" name="year" id="year" min="1990" max="2014" step="2" value="2014" /></div></p>\
     </form>\
 </div>');
 
@@ -545,6 +585,16 @@ d3.select("#year").on("mouseup", function(){
     currentYear = this.value;
     showMap(currentScale, currentMeasure, currentYear);
 });
+
+d3.select("#close").on("mouseup", function(){
+    $("#detail").hide("slow", function(){
+
+    });
+    $("#menu").show();
+});
+
+
+
 
 </script>
 </body>
