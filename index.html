@@ -70,6 +70,9 @@
 
 var svg = d3.select("#map1");
 
+var scatter = d3.select("#scatter");
+var yScale = d3.scaleLinear().domain([0.02,.07]).range([350,50]);
+
 var projection = d3.geoAlbersUsa().scale(75);
 var pathGenerator = d3.geoPath().projection(projection);
 
@@ -84,6 +87,10 @@ var ozoneScale = d3.scaleLinear().domain([0.012, 0.062]).interpolate(d3.interpol
 
 var counties, states;
 var usdaAtlas;
+
+var states_allyear, codes_to_name;
+var param_mapping = {"avgPM10Total":"PM10", "avgPM25":"PM25", "avgOzone":"Ozone",
+                      "avgSulfur_dioxide":"SO2","avgNOx":"NOx"};
 
 let currentScale = populationScale;
 let currentMeasure = "avgPM10Total";
@@ -363,22 +370,22 @@ function parseRow(row){
        });
 
         //Start of Map stuff
-        counties = topojson.feature(us_json_data, us_json_data.objects.counties);
+    counties = topojson.feature(us_json_data, us_json_data.objects.counties);
 		states = topojson.feature(us_json_data, us_json_data.objects.states);
-    
+    states_allyear = states_allyears
+    code_to_name = codes_to_names;
 		showMap(populationScale,"avgPM10Total","1990");
+
     plotState(scatter, states_allyears, "51", "Ozone",yScale,codes_to_names);
         $('#loading').toggle();
 
     }//END OF DONE FUNCTION
 
 //var scatter = d3.select("#scatter");
-var scatter = d3.select("#scatter");
-var yScale = d3.scaleLinear().domain([0.02,.07]).range([350,50]);
+
 
 
 function plotCountyLine(svg, county_years_data, color, xScale, yScale){
-  
   var plotLine = d3.line()
         .x(function(datum) { return xScale(Number(datum.x)); })
         .y(function(datum) { return yScale(Number(datum.y)); } );
@@ -395,7 +402,6 @@ function plotCountyLine(svg, county_years_data, color, xScale, yScale){
 
 //find the 8 counties with longest array corresponding to pollutant, call plotCountyLine on each county's array of years
 function plotState(svg_plot, states_allyears, statecode, pollutant, yScale,codes_to_names){
-
 
     var xScale = d3.scaleLinear().domain([1990,2016]).range([150,750]);
 
@@ -421,7 +427,6 @@ function plotState(svg_plot, states_allyears, statecode, pollutant, yScale,codes
     //console.log(counties);
     counties.sort(function (a,b){return state[a][pollutant].length < state[b][pollutant].length  ? 1 : -1;});
     counties = counties.splice(0,6);
-    console.log(counties);
 
 
     //plotCountyLine(svg, county_years_data, color, xScale, yScale)
@@ -432,7 +437,6 @@ function plotState(svg_plot, states_allyears, statecode, pollutant, yScale,codes
     }
 
     var state_name = codes_to_names[statecode];
-    console.log(state_name);
     svg_plot.append("text")
     .attr("x", 400)
     .attr("y", 400)
@@ -468,7 +472,11 @@ function showMap(scale, variable, year) {
 	
 	var paths = svg.selectAll("path.country").data(states.features);
 	paths.enter().append("path").attr("class", "country")
-	.on("click", function (d) { console.log(d.id); })
+	.on("click", function (d) { 
+    $("#scatter").empty();
+    var pollutant = param_mapping[currentMeasure];
+    plotState(scatter, states_allyear, d.id, pollutant, yScale,code_to_name);
+    console.log(currentMeasure); })
 	.merge(paths)
 	.transition().duration(1000)
 	.style("fill", function (state) {
