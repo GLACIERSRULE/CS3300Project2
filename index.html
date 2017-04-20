@@ -80,6 +80,8 @@ var populationScale = d3.scaleLinear().domain([0, 7, 15]).range(divergingColors)
 var percentScale = d3.scaleLinear()
 .domain([0, 25, 50, 75, 100]).range(sequentialColors);
 
+var ozoneScale = d3.scaleLinear().domain([0.012, 0.062]).interpolate(d3.interpolateHcl).range(["#ffff00","#cc0000"]);
+
 var counties, states;
 var usdaAtlas;
 
@@ -524,13 +526,16 @@ var sz = document.forms['myForm'].elements['group1'];
 for (var i=0, len = sz.length; i<len; i++){
     sz[i].onchange = function(){
         currentMeasure = this.value;
-        showMap(populationScale, currentMeasure, currentYear);
+        if (currentMeasure == "avgOzone") {
+            currentScale = ozoneScale;
+        }
+        showMap(currentScale, currentMeasure, currentYear);
     }
 }
 
 d3.select("#year").on("mouseup", function(){
     currentYear = this.value;
-    showMap(populationScale, currentMeasure, currentYear);
+    showMap(currentScale, currentMeasure, currentYear);
 });
 
 </script>
