@@ -6,10 +6,13 @@
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 
      <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="noUiSlider.9.2.0/nouislider.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
 
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
+    <script src="noUiSlider.9.2.0/nouislider.min.js"></script>
+    <script src="wNumb.js"></script>
 </head>
 <body>
     <style>
@@ -42,6 +45,10 @@
         #menu{
             float:left;
             padding: 40px;
+        }
+
+        label{
+            margin-right: 1em;
         }
     </style>
 <div id="loading">
@@ -310,7 +317,8 @@ function parseRow(row){
         counties = topojson.feature(us_json_data, us_json_data.objects.counties);
 		states = topojson.feature(us_json_data, us_json_data.objects.states);
 
-		showMap(populationScale,"avgPM10Total","2015");
+		showMap(populationScale,"avgPM10Total","1996");
+        $('#loading').toggle();
 
     }//END OF DONE FUNCTION
 
@@ -337,28 +345,47 @@ function showMap(scale, variable, year) {
 	.attr("d", function (county) {
 		return pathGenerator(county);
 	});
-
-    $('#loading').toggle();
 	
 }
 function changeMap(scale,variable,year){
-	var paths = svg.selectAll("path.country").data(counties.features);
+	var paths = svg.selectAll("path.country").data(states.features);
 	paths.enter().append("path").attr("class", "country")
 	.on("click", function (d) { console.log(d.id); })
 	.merge(paths)
 	.transition().duration(1000)
-	.style("fill", function (county) {
-        var result;
-		annual_data.forEach(function(d){
-			if (county.id == d.FIPS && d.Year == year){
+	.style("fill", function (state) {
+        var result = d3.rgb(0,0,0);
+		annual_states.forEach(function(d){
+			if (state.id == d.State_Code && d.Year == year){
                 result = scale(d[variable]);
 			}
 		});
         return result;	
 	});
 }
+let currentMeasure = "avgPM10Total";
+let currentYear = "1990";
 
-$('body').append('<div id="menu"><h4>Select Measure</h4><p><input class="with-gap" name="group1" type="radio" id="test1" checked /><label for="test1">PM10 Total</label></p><p><input class="with-gap" name="group1" type="radio" id="test2" /><label for="test2">Ozone</label></p><p><input class="with-gap" name="group1" type="radio" id="test3"  /><label for="test3">CO</label></p></div>');
+$('body').append('\
+<div id="menu">\
+    <h4>Select Measure</h4>\
+    <p><input class="with-gap" name="group1" type="radio" id="pm10" value="avgPM10Total" checked /><label for="pm10">Avg. PM10</label></p>\
+    <p><input class="with-gap" name="group1" type="radio" id="pm25" value="avgPM25" /><label for="pm25">Avg. PM25</label></p>\
+    <p><input class="with-gap" name="group1" type="radio" id="ozone" value="avgOzone" /><label for="ozone">Avg. Ozone</label></p>\
+    <p><input class="with-gap" name="group1" type="radio" id="so2" value="avgSulfur_dioxide" /><label for="so2">Avg. SO2</label></p>\
+    <p><input class="with-gap" name="group1" type="radio" id="nox" value="avgNOx" /><label for="nox">Avg. NOx</label></p>\
+    <h4>Select Year</h4>\
+    <p class="range-field"><label for="year">Year: <span id="thisYear">1990<span></label><input type="range" name="year" id="year" min="1990" max="2014" step="2" value="1990" /></div></p>\
+</div>');
+
+d3.select("#year").on("input", function(){
+    d3.select("#thisYear").html(this.value);
+});
+
+d3.select("#year").on("mouseup", function(){
+    currentYear = this.value;
+    showMap(populationScale, currentMeasure, currentYear);
+});
 
 </script>
 </body>
