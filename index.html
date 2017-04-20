@@ -134,6 +134,19 @@ var percentScale = d3.scaleLinear()
 
 
 var ozoneScale = d3.scaleLinear().domain([0.012, 0.062]).interpolate(d3.interpolateHcl).range(["#ffff00","#cc0000"]);
+var ozoneScaleScatter = d3.scaleLinear().domain([0.012, 0.062]).range([350, 50]);
+
+var PM10Scale = d3.scaleLinear().domain([6.90, 115]).interpolate(d3.interpolateHcl).range(["#ffff00","#cc0000"]);
+var PM10ScaleScatter = d3.scaleLinear().domain([6.90, 115]).range([350, 50]);
+
+var PM25Scale = d3.scaleLinear().domain([3.88, 43.8]).interpolate(d3.interpolateHcl).range(["#ffff00","#cc0000"]);
+var PM25ScaleScatter = d3.scaleLinear().domain([3.88, 43.8]).range([350, 50]);
+
+var SO2Scale = d3.scaleLinear().domain([0.012, 29.9]).interpolate(d3.interpolateHcl).range(["#ffff00","#cc0000"]);
+var SO2ScaleScatter = d3.scaleLinear().domain([0.012, 29.9]).range([350, 50]);
+
+var NOxScale = d3.scaleLinear().domain([0.6, 81.6]).interpolate(d3.interpolateHcl).range(["#ffff00","#cc0000"]);
+var NOxScaleScatter = d3.scaleLinear().domain([0.6, 81.6]).range([350, 50]);
 
 var counties, states;
 var usdaAtlas;
