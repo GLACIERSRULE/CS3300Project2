@@ -368,33 +368,22 @@ let currentYear = "1990";
 
 $('body').append('\
 <div id="menu">\
-    <form action="#" id="myForm">\
-        <h4>Select Measure</h4>\
-        <p><input class="with-gap" name="group1" type="radio" id="pm10" value="avgPM10Total" checked /><label for="pm10">Avg. PM10</label></p>\
-        <p><input class="with-gap" name="group1" type="radio" id="pm25" value="avgPM25" /><label for="pm25">Avg. PM25</label></p>\
-        <p><input class="with-gap" name="group1" type="radio" id="ozone" value="avgOzone" /><label for="ozone">Avg. Ozone</label></p>\
-        <p><input class="with-gap" name="group1" type="radio" id="so2" value="avgSulfur_dioxide" /><label for="so2">Avg. SO2</label></p>\
-        <p><input class="with-gap" name="group1" type="radio" id="nox" value="avgNOx" /><label for="nox">Avg. NOx</label></p>\
-        <h4>Select Year</h4>\
-        <p class="range-field"><label for="year">Year: <span id="thisYear">1990<span></label><input type="range" name="year" id="year" min="1990" max="2014" step="2" value="1990" /></div></p>\
-    </form>\
+    <h4>Select Measure</h4>\
+    <p><input class="with-gap" name="group1" type="radio" id="pm10" value="avgPM10Total" checked /><label for="pm10">Avg. PM10</label></p>\
+    <p><input class="with-gap" name="group1" type="radio" id="pm25" value="avgPM25" /><label for="pm25">Avg. PM25</label></p>\
+    <p><input class="with-gap" name="group1" type="radio" id="ozone" value="avgOzone" /><label for="ozone">Avg. Ozone</label></p>\
+    <p><input class="with-gap" name="group1" type="radio" id="so2" value="avgSulfur_dioxide" /><label for="so2">Avg. SO2</label></p>\
+    <p><input class="with-gap" name="group1" type="radio" id="nox" value="avgNOx" /><label for="nox">Avg. NOx</label></p>\
+    <h4>Select Year</h4>\
+    <p class="range-field"><label for="year">Year: <span id="thisYear">1990<span></label><input type="range" name="year" id="year" min="1990" max="2014" step="2" value="1990" /></div></p>\
 </div>');
 
 d3.select("#year").on("input", function(){
     d3.select("#thisYear").html(this.value);
 });
 
-var sz = document.forms['myForm'].elements['group1'];
-
-for (var i=0, len = sz.length; i<len; i++){
-    sz[i].onchange = function(){
-        currentMeasure = this.value;
-        showMap(populationScale, currentMeasure, currentYear);
-    }
-}
-
-d3.select("input[name='group1']").on("input", function() {
-    alert('hi');
+d3.select("#year").on("input", function(){
+    d3.select("#thisYear").html(this.value);
 });
 
 d3.select("#year").on("mouseup", function(){
