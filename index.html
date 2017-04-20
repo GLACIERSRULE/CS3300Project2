@@ -393,10 +393,6 @@ for (var i=0, len = sz.length; i<len; i++){
     }
 }
 
-d3.select("input[name='group1']").on("input", function() {
-    alert('hi');
-});
-
 d3.select("#year").on("mouseup", function(){
     currentYear = this.value;
     showMap(populationScale, currentMeasure, currentYear);
