@@ -61,6 +61,11 @@
 
 <svg id="map1" height="500" width="800"></svg>
 
+<br>
+<br>
+
+<svg id="scatter" height="400" width="800"></svg>
+
 <script type="text/javascript">
 
 var svg = d3.select("#map1");
@@ -174,6 +179,40 @@ function parseRow(row){
         	});
         	return result;
         }); 
+
+        states_allyears = {};
+
+        for (i=0; i<annual_data.length;i++){
+          d = annual_data[i];
+          if ( !(d.State_Code in states_allyears) ){
+            states_allyears[d.State_Code] = {};
+          }
+          if ( !(d.County_Code in states_allyears[d.State_Code]) ){
+            states_allyears[d.State_Code][d.County_Code] = {Ozone:[], PM25:[], PM10:[], CO:[], SO2:[], NOx:[]};
+          }
+
+          var county = states_allyears[d.State_Code][d.County_Code];
+
+          if ("Ozone" in d){
+            county.Ozone.push({x: d.Year, y: d.Ozone});
+          }
+          if ("PM25" in d){
+            county.PM25.push({x: d.Year, y: d.PM25});
+          }
+          if ("PM10" in d){
+            county.PM10.push({x: d.Year, y: d.PM10});
+          }
+          if ("Carbon_monoxide" in d){
+            county.CO.push({x: d.Year, y: d.Carbon_monoxide});
+          }
+          if ("Sulfur_dioxide" in d){
+            county.SO2.push({x: d.Year, y: d.Sulfur_dioxide});
+          }
+          if ("NOx" in d){
+            county.NOx.push({x: d.Year, y: d.NOx});
+          }
+        }
+
         county_data = combined_Yearly.map(function(county){
         	var result = {
         		FIPS: county.key
@@ -316,11 +355,84 @@ function parseRow(row){
         //Start of Map stuff
         counties = topojson.feature(us_json_data, us_json_data.objects.counties);
 		states = topojson.feature(us_json_data, us_json_data.objects.states);
-
+    
 		showMap(populationScale,"avgPM10Total","1990");
+    plotState(scatter, states_allyears, "48", "Ozone",yScale);
         $('#loading').toggle();
 
     }//END OF DONE FUNCTION
+
+//var scatter = d3.select("#scatter");
+var scatter = d3.select("#scatter");
+var yScale = d3.scaleLinear().domain([0.02,.07]).range([350,50]);
+
+
+function plotCountyLine(svg, county_years_data, color, xScale, yScale){
+  console.log(county_years_data);
+  var plotLine = d3.line()
+        .x(function(datum) { return xScale(Number(datum.x)); })
+        .y(function(datum) { return yScale(Number(datum.y)); } );
+
+        scatter.append("path")
+        .attr("d", plotLine(county_years_data))
+        .attr("stroke",color)
+        .attr("stroke-width",5)
+        .attr("fill","none")
+        .style("stroke-opacity", 0.50);
+    }
+
+
+
+//find the 8 counties with longest array corresponding to pollutant, call plotCountyLine on each county's array of years
+function plotState(svg_plot, states_allyears, statecode, pollutant, yScale){
+    var xScale = d3.scaleLinear().domain([1990,2016]).range([150,750]);
+
+    var xAxis = d3.axisBottom(xScale)
+          .ticks(10)
+          .tickFormat(d3.format("d"));
+
+    var yAxis = d3.axisLeft(yScale)
+          .ticks(5);
+
+    svg_plot.append("g")
+    .call(xAxis)
+    .attr("transform", "translate(0,350)");
+                    
+    svg_plot.append("g")
+    .call(yAxis)
+    .attr("transform", "translate(150,0)");
+
+    svg_plot.append("text")
+    .attr("x", 400)
+    .attr("y", 400)
+    .text("Year")
+    .attr("font-size", "20px")
+      .attr("fill", "black");
+
+    svg_plot.append("text")
+    .attr("x",25)
+    .attr("y", 200)
+    .text(pollutant)
+    .attr("font-size", "20px")
+      .attr("fill", "black");
+
+    var state = states_allyears[statecode];
+    var counties = Object.keys(state).splice(1);
+
+    counties.sort(function (a,b){return state[a][pollutant].length < state[b][pollutant].length  ? 1 : -1;});
+    counties = counties.splice(0,6);
+    console.log(counties);
+
+
+    //plotCountyLine(svg, county_years_data, color, xScale, yScale)
+    for (i=0;i<counties.length;i++){
+      var county_data = state[counties[i]][pollutant];
+      var color = sequentialColors[i];
+      plotCountyLine(scatter,county_data,color,xScale,yScale);
+    }
+}
+
+
 
 function showMap(scale, variable, year) {
 	// Create or modify paths for each country
