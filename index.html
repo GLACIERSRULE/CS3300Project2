@@ -437,7 +437,7 @@ function parseRow(row){
 		states = topojson.feature(us_json_data, us_json_data.objects.states);
     states_allyear = states_allyears
     code_to_name = codes_to_names;
-		showMap(populationScale,"avgPM10Total","2014");
+	showMap(ozoneScale,"avgOzone","2014");
 
     plotState(scatter, states_allyears, "51", "Ozone",yScale,codes_to_names);
     $('#loading').toggle();
@@ -584,9 +584,9 @@ $('body').append('\
 <div id="menu">\
     <form action="#" id="myForm">\
         <h4>Select Measure</h4>\
-        <p><input class="with-gap" name="group1" type="radio" id="pm10" value="avgPM10Total" checked /><label for="pm10">Avg. PM10</label></p>\
+        <p><input class="with-gap" name="group1" type="radio" id="pm10" value="avgPM10Total" /><label for="pm10">Avg. PM10</label></p>\
         <p><input class="with-gap" name="group1" type="radio" id="pm25" value="avgPM25" /><label for="pm25">Avg. PM25</label></p>\
-        <p><input class="with-gap" name="group1" type="radio" id="ozone" value="avgOzone" /><label for="ozone">Avg. Ozone</label></p>\
+        <p><input class="with-gap" name="group1" type="radio" id="ozone" value="avgOzone" checked /><label for="ozone">Avg. Ozone</label></p>\
         <p><input class="with-gap" name="group1" type="radio" id="so2" value="avgSulfur_dioxide" /><label for="so2">Avg. SO2</label></p>\
         <p><input class="with-gap" name="group1" type="radio" id="nox" value="avgNOx" /><label for="nox">Avg. NOx</label></p>\
         <h4>Select Year</h4>\
@@ -605,6 +605,18 @@ for (var i=0, len = sz.length; i<len; i++){
         currentMeasure = this.value;
         if (currentMeasure == "avgOzone") {
             currentScale = ozoneScale;
+        }
+        if (currentMeasure == "avgPM10Total") {
+            currentScale = PM10Scale;
+        }
+        if (currentMeasure == "avgPM25") {
+            currentScale = PM25Scale;
+        }
+        if (currentMeasure == "avgSulfur_dioxide") {
+            currentScale = SO2Scale;
+        }
+        if (currentMeasure == "avgNOx") {
+            currentScale = NOxScale;
         }
         showMap(currentScale, currentMeasure, currentYear);
     }
