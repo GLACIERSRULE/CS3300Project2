@@ -83,6 +83,10 @@ var percentScale = d3.scaleLinear()
 var counties, states;
 var usdaAtlas;
 
+let currentScale = populationScale;
+let currentMeasure = "avgPM10Total";
+let currentYear = "1990";
+
 function parseRow(row){
 	row.FIPS = row.State_Code + row.County_Code;
 	row.FIPS = Number(row.FIPS);
@@ -495,8 +499,7 @@ function changeMap(scale,variable,year){
         return result;	
 	});
 }
-let currentMeasure = "avgPM10Total";
-let currentYear = "1990";
+
 
 $('body').append('\
 <div id="menu">\
