@@ -181,11 +181,13 @@ function parseRow(row){
         }); 
 
         states_allyears = {};
+        codes_to_names = {};
 
         for (i=0; i<annual_data.length;i++){
           d = annual_data[i];
           if ( !(d.State_Code in states_allyears) ){
             states_allyears[d.State_Code] = {};
+            codes_to_names[d.State_Code]= d.State;
           }
           if ( !(d.County_Code in states_allyears[d.State_Code]) ){
             states_allyears[d.State_Code][d.County_Code] = {Ozone:[], PM25:[], PM10:[], CO:[], SO2:[], NOx:[]};
@@ -212,6 +214,7 @@ function parseRow(row){
             county.NOx.push({x: d.Year, y: d.NOx});
           }
         }
+
 
         county_data = combined_Yearly.map(function(county){
         	var result = {
@@ -252,6 +255,7 @@ function parseRow(row){
         	});
         	return result;
         }); 
+
         
        states_nested = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2015_csv);
        //states2015 = d3.nest().key(function(d){return d.State_Code;}).entries(annual_2015_csv);
@@ -357,7 +361,7 @@ function parseRow(row){
 		states = topojson.feature(us_json_data, us_json_data.objects.states);
     
 		showMap(populationScale,"avgPM10Total","1990");
-    plotState(scatter, states_allyears, "48", "Ozone",yScale);
+    plotState(scatter, states_allyears, "51", "Ozone",yScale,codes_to_names);
         $('#loading').toggle();
 
     }//END OF DONE FUNCTION
@@ -368,7 +372,7 @@ var yScale = d3.scaleLinear().domain([0.02,.07]).range([350,50]);
 
 
 function plotCountyLine(svg, county_years_data, color, xScale, yScale){
-  console.log(county_years_data);
+  
   var plotLine = d3.line()
         .x(function(datum) { return xScale(Number(datum.x)); })
         .y(function(datum) { return yScale(Number(datum.y)); } );
@@ -384,7 +388,9 @@ function plotCountyLine(svg, county_years_data, color, xScale, yScale){
 
 
 //find the 8 counties with longest array corresponding to pollutant, call plotCountyLine on each county's array of years
-function plotState(svg_plot, states_allyears, statecode, pollutant, yScale){
+function plotState(svg_plot, states_allyears, statecode, pollutant, yScale,codes_to_names){
+
+
     var xScale = d3.scaleLinear().domain([1990,2016]).range([150,750]);
 
     var xAxis = d3.axisBottom(xScale)
@@ -402,23 +408,11 @@ function plotState(svg_plot, states_allyears, statecode, pollutant, yScale){
     .call(yAxis)
     .attr("transform", "translate(150,0)");
 
-    svg_plot.append("text")
-    .attr("x", 400)
-    .attr("y", 400)
-    .text("Year")
-    .attr("font-size", "20px")
-      .attr("fill", "black");
-
-    svg_plot.append("text")
-    .attr("x",25)
-    .attr("y", 200)
-    .text(pollutant)
-    .attr("font-size", "20px")
-      .attr("fill", "black");
+    
 
     var state = states_allyears[statecode];
     var counties = Object.keys(state).splice(1);
-
+    //console.log(counties);
     counties.sort(function (a,b){return state[a][pollutant].length < state[b][pollutant].length  ? 1 : -1;});
     counties = counties.splice(0,6);
     console.log(counties);
@@ -430,6 +424,32 @@ function plotState(svg_plot, states_allyears, statecode, pollutant, yScale){
       var color = sequentialColors[i];
       plotCountyLine(scatter,county_data,color,xScale,yScale);
     }
+
+    var state_name = codes_to_names[statecode];
+    console.log(state_name);
+    svg_plot.append("text")
+    .attr("x", 400)
+    .attr("y", 400)
+    .attr("font-family", "Century Gothic")
+    .text("Year")
+    .attr("font-size", "20px")
+      .attr("fill", "black");
+
+    svg_plot.append("text")
+    .attr("x",25)
+    .attr("y", 200)
+    .attr("font-family", "Century Gothic")
+    .text(pollutant)
+    .attr("font-size", "20px")
+      .attr("fill", "black");
+
+    svg_plot.append("text")
+    .attr("x",400)
+    .attr("y", 45)
+    .attr("font-family", "Century Gothic")
+    .text(state_name)
+    .attr("font-size", "25px")
+      .attr("fill", "black");
 }
 
 
