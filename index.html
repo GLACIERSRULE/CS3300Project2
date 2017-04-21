@@ -178,9 +178,9 @@ var counties, states;
 var usdaAtlas;
 
 var states_allyear, codes_to_name;
-var param_mapping = {"avgPM10Total":["PM10", PM10ScaleScatter], "avgPM25":["PM25",PM25ScaleScatter], 
-                    "avgOzone":["Ozone",ozoneScaleScatter],
-                      "avgSulfur_dioxide":["SO2",SO2ScaleScatter],"avgNOx":["NOx",NOxScaleScatter]};
+var param_mapping = {"avgPM10Total":["PM10", PM10ScaleScatter,"ug/m3"], "avgPM25":["PM25",PM25ScaleScatter,"ug/m3"], 
+                    "avgOzone":["Ozone",ozoneScaleScatter, "PPM"],
+                      "avgSulfur_dioxide":["SO2",SO2ScaleScatter,"million tons"],"avgNOx":["NOx",NOxScaleScatter,"million tons"]};
 
 let currentScale = populationScale;
 let currentMeasure = "avgOzone";
@@ -492,7 +492,7 @@ function plotCountyLine(svg, county_years_data, color, xScale, yScale){
 
 
 //find the 8 counties with longest array corresponding to pollutant, call plotCountyLine on each county's array of years
-function plotState(svg_plot, states_allyears, statecode, pollutant, yScale,codes_to_names){
+function plotState(svg_plot, states_allyears, statecode, pollutant, yScale,codes_to_names,unit){
 
     var xScale = d3.scaleLinear().domain([1990,2016]).range([150,750]);
 
@@ -532,22 +532,33 @@ function plotState(svg_plot, states_allyears, statecode, pollutant, yScale,codes
     .attr("x", 400)
     .attr("y", 400)
     .attr("font-family", "Century Gothic")
+    .attr("text-anchor","middle")
     .text("Year")
     .attr("font-size", "20px")
       .attr("fill", "black");
 
     svg_plot.append("text")
-    .attr("x",25)
+    .attr("x",70)
     .attr("y", 200)
     .attr("font-family", "Century Gothic")
+    .attr("text-anchor","middle")
     .text(pollutant)
     .attr("font-size", "20px")
+      .attr("fill", "black");
+
+    svg_plot.append("text")
+    .attr("x",70)
+    .attr("y", 220)
+    .attr("text-anchor","middle")
+    .text("("+unit+")")
+    .attr("font-size", "15px")
       .attr("fill", "black");
 
     svg_plot.append("text")
     .attr("x",400)
     .attr("y", 45)
     .attr("font-family", "Century Gothic")
+    .attr("text-anchor","middle")
     .text(state_name)
     .attr("font-size", "25px")
       .attr("fill", "black");
@@ -566,8 +577,9 @@ function showMap(scale, variable, year) {
 	.on("click", function (d) { 
         $("#scatter").empty();
         var pollutant_name = param_mapping[currentMeasure][0];
-        var pollutant_scale = param_mapping[currentMeasure][1]
-        plotState(scatter, states_allyear, d.id, pollutant_name, pollutant_scale,code_to_name);
+        var pollutant_scale = param_mapping[currentMeasure][1];
+        var unit = param_mapping[currentMeasure][2];
+        plotState(scatter, states_allyear, d.id, pollutant_name, pollutant_scale,code_to_name, unit);
         $("#menu").toggle();
         $('#detail').toggle("slow", function(){
 
