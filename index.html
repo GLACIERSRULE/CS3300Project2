@@ -111,7 +111,7 @@
     <form action="#" id="myForm">
         <h4>Select Measure</h4>
         <p><input class="with-gap" name="group1" type="radio" id="pm10" value="avgPM10Total" /><label for="pm10">Avg. PM10</label></p>
-        <p><input class="with-gap" name="group1" type="radio" id="pm25" value="avgPM25" /><label for="pm25">Avg. PM25</label></p>
+        <p><input class="with-gap" name="group1" type="radio" id="pm25" value="avgPM25" /><label for="pm25">Avg. PM2.5</label></p>
         <p><input class="with-gap" name="group1" type="radio" id="ozone" value="avgOzone" checked /><label for="ozone">Avg. Ozone</label></p>
         <p><input class="with-gap" name="group1" type="radio" id="so2" value="avgSulfur_dioxide" /><label for="so2">Avg. SO2</label></p>
         <p><input class="with-gap" name="group1" type="radio" id="nox" value="avgNOx" /><label for="nox">Avg. NOx</label></p>
@@ -612,7 +612,16 @@ $('body').append('\
 ');
 
 $('body').append('\
-<p>To change the year, please user the slider. Click on different measures to view different pollution measures. Click on a state to view county data.</p>\
+<p>To change the year, please user the slider. Click on different measures to view different pollution measures. Click on a state to view most represented county data per state (show as lines).</p>\
+');
+
+$('body').append('\
+<h3>Measure Key</h3>\
+<p>PM10: Particle matter in the air that is 10 micrometers or less in diameter.</p>\
+<p>PM2.5: Particle matter in the air that is 2.5 micrometers or less in diameter.</p>\
+<p>Ozone: Made up of three oxygen atoms. Protects Earth from the Sun and is created in part by chemical reactions between air pollutants.</p>\
+<p>SO2: Sulfur dioxide. Can be quite harmful to the human respiratory system.</p>\
+<p>NOx: A group of nitrogen oxides that are often found in the air. All are poisonous and harmful to the human respiratory system as well as vegetation.</p>\
 ');
 
 d3.select("#year").on("input", function(){
