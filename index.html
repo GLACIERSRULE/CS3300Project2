@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title> Project Two</title>
+	<title>Project Two - Sam Hamburger, Brian Zahka, Weston Forster, Sam Weintraub</title>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="http://d3js.org/topojson.v2.min.js"></script>
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
@@ -93,7 +93,6 @@
         }
     </style>
 <div id="header">
-<h6>Sam Hamburger, Brian Zahka, Weston Forster, Sam Weintraub</h6>
 <h2>Pollution in the United States</h2>
 <h4>By State, County, and Year<h4>
 </div>
@@ -108,10 +107,23 @@
 
 <svg id="map1" height="500" width="800"></svg>
 
+<div id="menu">
+    <form action="#" id="myForm">
+        <h4>Select Measure</h4>
+        <p><input class="with-gap" name="group1" type="radio" id="pm10" value="avgPM10Total" /><label for="pm10">Avg. PM10</label></p>
+        <p><input class="with-gap" name="group1" type="radio" id="pm25" value="avgPM25" /><label for="pm25">Avg. PM25</label></p>
+        <p><input class="with-gap" name="group1" type="radio" id="ozone" value="avgOzone" checked /><label for="ozone">Avg. Ozone</label></p>
+        <p><input class="with-gap" name="group1" type="radio" id="so2" value="avgSulfur_dioxide" /><label for="so2">Avg. SO2</label></p>
+        <p><input class="with-gap" name="group1" type="radio" id="nox" value="avgNOx" /><label for="nox">Avg. NOx</label></p>
+        <h4>Select Year</h4>
+        <p class="range-field"><label for="year">Year: <span id="thisYear">2014<span></label><input type="range" name="year" id="year" min="1990" max="2014" step="2" value="2014" /></div></p>
+    </form>
+</div>
+
 <br>
 <br>
 
-<svg id="legend" height="100" width="800">
+<svg id="legend" height="80" width="800">
   <defs>
     <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" style="stop-color:#ffff00;stop-opacity:1" />
@@ -119,6 +131,8 @@
     </linearGradient>
   </defs>
   <rect x="200" y= "20" height="20" width="400" fill="url(#grad1)" style="opacity:0.7" />
+  <text x="200" y="55" font-size="10" text-anchor="middle">Less Polluted</text>
+  <text x="600" y="55" font-size="10" text-anchor="middle">More Polluted</text>
 </svg>
 
 <div id="detail">
@@ -592,21 +606,6 @@ function changeMap(scale,variable,year){
         return result;	
 	});
 }
-
-
-$('body').append('\
-<div id="menu">\
-    <form action="#" id="myForm">\
-        <h4>Select Measure</h4>\
-        <p><input class="with-gap" name="group1" type="radio" id="pm10" value="avgPM10Total" /><label for="pm10">Avg. PM10</label></p>\
-        <p><input class="with-gap" name="group1" type="radio" id="pm25" value="avgPM25" /><label for="pm25">Avg. PM25</label></p>\
-        <p><input class="with-gap" name="group1" type="radio" id="ozone" value="avgOzone" checked /><label for="ozone">Avg. Ozone</label></p>\
-        <p><input class="with-gap" name="group1" type="radio" id="so2" value="avgSulfur_dioxide" /><label for="so2">Avg. SO2</label></p>\
-        <p><input class="with-gap" name="group1" type="radio" id="nox" value="avgNOx" /><label for="nox">Avg. NOx</label></p>\
-        <h4>Select Year</h4>\
-        <p class="range-field"><label for="year">Year: <span id="thisYear">2014<span></label><input type="range" name="year" id="year" min="1990" max="2014" step="2" value="2014" /></div></p>\
-    </form>\
-</div>');
 
 $('body').append('\
 <p>*Please Note that any states filled with black do not have enough data.</p>\
