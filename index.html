@@ -5,6 +5,8 @@
     <script src="http://d3js.org/topojson.v2.min.js"></script>
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 
+    <!-- We used the MaterializeCSS Framework and jQuery for components -->
+
      <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="noUiSlider.9.2.0/nouislider.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
@@ -593,6 +595,14 @@ $('body').append('\
         <p class="range-field"><label for="year">Year: <span id="thisYear">2014<span></label><input type="range" name="year" id="year" min="1990" max="2014" step="2" value="2014" /></div></p>\
     </form>\
 </div>');
+
+$('body').append('\
+<p>*Please Note that any states filled with black do not have enough data.</p>\
+');
+
+$('body').append('\
+<p>To change the year, please user the slider. Click on different measures to view different pollution measures. Click on a state to view county data.</p>\
+');
 
 d3.select("#year").on("input", function(){
     d3.select("#thisYear").html(this.value);
