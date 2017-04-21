@@ -109,6 +109,16 @@
 <br>
 <br>
 
+<svg id="legend" height="100" width="800">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffff00;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#cc0000;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect x="200" y= "20" height="20" width="400" fill="url(#grad1)" style="opacity:0.7" />
+</svg>
+
 <div id="detail">
     <a class="waves-effect waves-light btn" id="close">close</a>
     <p><svg id="scatter" height="400" width="800"></svg></p>
@@ -152,11 +162,12 @@ var counties, states;
 var usdaAtlas;
 
 var states_allyear, codes_to_name;
-var param_mapping = {"avgPM10Total":"PM10", "avgPM25":"PM25", "avgOzone":"Ozone",
-                      "avgSulfur_dioxide":"SO2","avgNOx":"NOx"};
+var param_mapping = {"avgPM10Total":["PM10", PM10ScaleScatter], "avgPM25":["PM25",PM25ScaleScatter], 
+                    "avgOzone":["Ozone",ozoneScaleScatter],
+                      "avgSulfur_dioxide":["SO2",SO2ScaleScatter],"avgNOx":["NOx",NOxScaleScatter]};
 
 let currentScale = populationScale;
-let currentMeasure = "avgPM10Total";
+let currentMeasure = "avgOzone";
 let currentYear = "2014";
 
 function parseRow(row){
@@ -277,8 +288,8 @@ function parseRow(row){
           if ("PM25" in d){
             county.PM25.push({x: d.Year, y: d.PM25});
           }
-          if ("PM10" in d){
-            county.PM10.push({x: d.Year, y: d.PM10});
+          if ("PM10Total" in d){
+            county.PM10.push({x: d.Year, y: d.PM10Total});
           }
           if ("Carbon_monoxide" in d){
             county.CO.push({x: d.Year, y: d.Carbon_monoxide});
@@ -538,8 +549,9 @@ function showMap(scale, variable, year) {
 	paths.enter().append("path").attr("class", "country")
 	.on("click", function (d) { 
         $("#scatter").empty();
-        var pollutant = param_mapping[currentMeasure];
-        plotState(scatter, states_allyear, d.id, pollutant, yScale,code_to_name);
+        var pollutant_name = param_mapping[currentMeasure][0];
+        var pollutant_scale = param_mapping[currentMeasure][1]
+        plotState(scatter, states_allyear, d.id, pollutant_name, pollutant_scale,code_to_name);
         $("#menu").toggle();
         $('#detail').toggle("slow", function(){
 
