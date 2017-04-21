@@ -182,7 +182,7 @@ var param_mapping = {"avgPM10Total":["PM10", PM10ScaleScatter], "avgPM25":["PM25
                     "avgOzone":["Ozone",ozoneScaleScatter],
                       "avgSulfur_dioxide":["SO2",SO2ScaleScatter],"avgNOx":["NOx",NOxScaleScatter]};
 
-let currentScale = populationScale;
+let currentScale = ozoneScale;
 let currentMeasure = "avgOzone";
 let currentYear = "2014";
 
@@ -643,9 +643,10 @@ for (var i=0, len = sz.length; i<len; i++){
     }
 }
 
-d3.select("#year").on("mouseup", function(){
+d3.select("#year").on("input", function(){
     currentYear = this.value;
     showMap(currentScale, currentMeasure, currentYear);
+    $('#thisYear').html(currentYear);
 });
 
 d3.select("#close").on("mouseup", function(){
